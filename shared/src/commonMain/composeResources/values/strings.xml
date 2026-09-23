@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_title">Каталог видов</string>
+    <string name="taxon_number">№ %1$s</string>
+</resources>
