@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_title">Каталог видов</string>
-    <string name="taxon_number">№ %1$s</string>
+    <string name="app_title">Species Catalog</string>
+    <string name="section_parent">Parent</string>
+    <string name="section_children">Children</string>
+    <string name="taxon_number">No. %1$s</string>
+    <string name="action_back">Back</string>
 </resources>
