@@ -14,11 +14,9 @@ import androidx.compose.ui.unit.dp
 import ru.omgtu.abramov.detail.TaxonDetailIntent
 import ru.omgtu.abramov.resources.Res
 import ru.omgtu.abramov.resources.section_children
-import ru.omgtu.abramov.resources.section_parent
 import ru.omgtu.abramov.ui.components.TaxonBaseStats
 import ru.omgtu.abramov.ui.components.TaxonChildrenButton
 import ru.omgtu.abramov.ui.components.TaxonDescription
-import ru.omgtu.abramov.ui.components.TaxonParentButton
 import ru.omgtu.abramov.ui.model.TaxonDetailUi
 import org.jetbrains.compose.resources.stringResource
 
@@ -43,18 +41,11 @@ fun TaxonDetailScreen(
 
         taxon.description?.let { TaxonDescription(it) }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (taxon.parentKey != null) {
-                TaxonParentButton(
-                    label = stringResource(Res.string.section_parent),
-                    onClick = { onIntent(TaxonDetailIntent.OpenParent) },
-                )
-            }
-            if (taxon.hasChildren) {
+        if (taxon.hasChildren) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 TaxonChildrenButton(
                     label = stringResource(Res.string.section_children),
                     onClick = { onIntent(TaxonDetailIntent.OpenChildren) },

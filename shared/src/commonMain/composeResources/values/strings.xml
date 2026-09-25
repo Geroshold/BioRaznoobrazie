@@ -1,7 +1,14 @@
 <resources>
     <string name="app_title">Species Catalog</string>
-    <string name="section_parent">Parent</string>
     <string name="section_children">Children</string>
     <string name="taxon_number">No. %1$s</string>
     <string name="action_back">Back</string>
+
+    <string name="rank_kingdom">Kingdom</string>
+    <string name="rank_phylum">Phylum</string>
+    <string name="rank_class">Class</string>
+    <string name="rank_order">Order</string>
+    <string name="rank_family">Family</string>
+    <string name="rank_genus">Genus</string>
+    <string name="rank_species">Species</string>
 </resources>

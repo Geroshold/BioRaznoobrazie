@@ -31,13 +31,8 @@ class TaxonDetailViewModel(
 
     fun onIntent(intent: TaxonDetailIntent) {
         when (intent) {
-            TaxonDetailIntent.OpenParent -> openParent()
             TaxonDetailIntent.OpenChildren -> openChildren()
         }
-    }
-
-    private fun openParent() {
-        _state.value?.parentKey?.let { navigator.addToBackStack(Screen.Detail(it)) }
     }
 
     private fun openChildren() {
