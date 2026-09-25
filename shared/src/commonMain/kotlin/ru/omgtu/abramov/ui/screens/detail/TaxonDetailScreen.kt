@@ -1,8 +1,8 @@
 package ru.omgtu.abramov.ui.screens.detail
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -42,9 +42,9 @@ fun TaxonDetailScreen(
         taxon.description?.let { TaxonDescription(it) }
 
         if (taxon.hasChildren) {
-            Row(
+            Box(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                contentAlignment = Alignment.Center,
             ) {
                 TaxonChildrenButton(
                     label = stringResource(Res.string.section_children),

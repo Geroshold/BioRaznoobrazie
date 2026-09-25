@@ -24,7 +24,10 @@ val mockTaxons: List<Taxon> = listOf(
         numDescendants = 2981931,
         kingdom = "Animalia",
         phylum = null,
-        description = "Key to Chalcovietnamicus species groups and species 1. Embolus screw-like, without large embolic disc (ED) hidden between palpal bulb and cymbium; retromargin of chelicerae with one large fissidentate tooth of four cusps (Logunov 2020: figs 5–6).",
+        description = "Key to Chalcovietnamicus species groups and species 1. " +
+                "Embolus screw-like, without large embolic disc (ED) hidden between " +
+                "palpal bulb and cymbium; retromargin of chelicerae with one large fissidentate " +
+                "tooth of four cusps (Logunov 2020: figs 5–6).",
     ),
     Taxon(
         key = 2,
@@ -156,7 +159,8 @@ val mockTaxons: List<Taxon> = listOf(
         numDescendants = 2280,
         kingdom = "Animalia",
         phylum = "Tardigrada",
-        description = "Tardigrada Bathyechiniscus craticulus Pollock, 1983; re-described and new combination as Styraconyx craticulus (Pollock, 1983) in Kristensen & Higgins (1984a).",
+        description = "Tardigrada Bathyechiniscus craticulus Pollock, 1983; re-described and new combination " +
+                "as Styraconyx craticulus (Pollock, 1983) in Kristensen & Higgins (1984a).",
     ),
     Taxon(
         key = 17,
