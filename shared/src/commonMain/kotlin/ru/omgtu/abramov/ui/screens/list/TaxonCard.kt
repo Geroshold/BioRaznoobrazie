@@ -1,4 +1,4 @@
-package ru.omgtu.abramov.ui.screensList
+package ru.omgtu.abramov.ui.screens.list
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

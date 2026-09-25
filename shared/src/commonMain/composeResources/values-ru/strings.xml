@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_title">Каталог видов</string>
+    <string name="section_children">Дочерние таксоны</string>
+    <string name="taxon_number">№ %1$s</string>
+    <string name="action_back">Назад</string>
+    <string name="action_toggle_theme">Сменить тему</string>
+    <string name="rank_kingdom">Царство</string>
+    <string name="rank_phylum">Тип</string>
+    <string name="rank_class">Класс</string>
+    <string name="rank_order">Отряд</string>
+    <string name="rank_family">Семейство</string>
+    <string name="rank_genus">Род</string>
+    <string name="rank_species">Вид</string>
+</resources>

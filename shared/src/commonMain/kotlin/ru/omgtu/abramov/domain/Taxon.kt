@@ -8,15 +8,16 @@ data class Taxon(
     val parentKey: Int?,
     val numDescendants: Int,
     val kingdom: String?,
-    val family: String?,
-    val genus: String?
+    val phylum: String?,
+    val description: String?,
 )
 
 enum class Rank {
-    KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES;
-
-    companion object {
-        fun of(value: String): Rank =
-            entries.firstOrNull { it.name == value } ?: SPECIES
-    }
+    KINGDOM,
+    PHYLUM,
+    CLASS,
+    ORDER,
+    FAMILY,
+    GENUS,
+    SPECIES
 }

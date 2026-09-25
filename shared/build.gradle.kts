@@ -74,6 +74,11 @@ dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 }
 
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
 compose.resources {
     publicResClass = true
     packageOfResClass = "ru.omgtu.abramov.resources"
