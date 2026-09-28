@@ -10,7 +10,7 @@ import ru.omgtu.abramov.ui.model.RankUi
 fun RankRow(ranks: List<RankUi>) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         ranks.forEach { rank ->
-            RankChip(label = rank.name, color = rank.color)
+            RankChip(rank = rank)
         }
     }
 }

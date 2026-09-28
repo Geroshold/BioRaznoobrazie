@@ -17,4 +17,17 @@
     </svg>
     <script type="application/javascript" src="webApp.js"></script>
 </body>
+<script>
+    var currentLanguagesImplementation = Object.getOwnPropertyDescriptor(Navigator.prototype, "languages");
+    var newLanguagesImplementation = Object.assign({}, currentLanguagesImplementation, {
+        get: function () {
+            if (window.__customLocale) {
+                return [window.__customLocale];
+            } else {
+                return currentLanguagesImplementation.get.apply(this);
+            }
+        }
+    });
+    Object.defineProperty(Navigator.prototype, "languages", newLanguagesImplementation);
+</script>
 </html>
