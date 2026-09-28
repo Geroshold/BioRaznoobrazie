@@ -18,6 +18,9 @@ import ru.omgtu.abramov.list.TaxonListViewModelFactory
 import ru.omgtu.abramov.resources.Res
 import ru.omgtu.abramov.resources.action_toggle_theme
 import ru.omgtu.abramov.resources.ic_theme
+import ru.omgtu.abramov.resources.ic_language
+import ru.omgtu.abramov.ui.AppEnvironment
+import ru.omgtu.abramov.ui.customAppLocale
 import ru.omgtu.abramov.ui.AppTheme
 import ru.omgtu.abramov.ui.components.AppScaffold
 import ru.omgtu.abramov.ui.navigation.AppNavDisplay
@@ -26,42 +29,52 @@ import ru.omgtu.abramov.ui.navigation.Navigator
 @Composable
 fun App() {
     var darkTheme by remember { mutableStateOf(false) }
-
-    AppTheme(darkTheme) {
-        val repository: TaxonRepository = remember { TaxonRepositoryImpl() }
-        val navigator = remember { Navigator() }
-        val listViewModelFactory = remember { TaxonListViewModelFactory(navigator, repository) }
-        val detailViewModelFactory = remember { TaxonDetailViewModelFactory(navigator, repository) }
-        val childrenViewModelFactory: (Int) -> TaxonListViewModelFactory =
-            remember {
-                { parentKey ->
-                    TaxonListViewModelFactory(navigator, repository, parentKey)
+    val repository: TaxonRepository = remember { TaxonRepositoryImpl() }
+    val navigator = remember { Navigator() }
+    AppEnvironment {
+        AppTheme(darkTheme) {
+            val listViewModelFactory = remember { TaxonListViewModelFactory(navigator, repository) }
+            val detailViewModelFactory =
+                remember { TaxonDetailViewModelFactory(navigator, repository) }
+            val childrenViewModelFactory: (Int) -> TaxonListViewModelFactory =
+                remember {
+                    { parentKey ->
+                        TaxonListViewModelFactory(navigator, repository, parentKey)
+                    }
                 }
+
+            val navStack = navigator.navStack.collectAsStateWithLifecycle()
+            val backNavigationIsAvailable by remember {
+                derivedStateOf { navStack.value.size > 1 }
             }
 
-        val navStack = navigator.navStack.collectAsStateWithLifecycle()
-        val backNavigationIsAvailable by remember {
-            derivedStateOf { navStack.value.size > 1 }
-        }
-
-        AppScaffold(
-            onBack = navigator::back.takeIf { backNavigationIsAvailable },
-            actions = {
-                IconButton(onClick = { darkTheme = !darkTheme }) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_theme),
-                        contentDescription = stringResource(Res.string.action_toggle_theme),
-                    )
-                }
-            },
-        ) { modifier ->
-            AppNavDisplay(
-                modifier = modifier,
-                navigator = navigator,
-                listViewModelFactory = listViewModelFactory,
-                detailViewModelFactory = detailViewModelFactory,
-                childrenViewModelFactory = childrenViewModelFactory,
-            )
+            AppScaffold(
+                onBack = navigator::back.takeIf { backNavigationIsAvailable },
+                actions = {
+                    IconButton(onClick = {
+                        customAppLocale = if (customAppLocale == "ru") "en" else "ru"
+                    }) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_language),
+                            contentDescription = "Switch language"
+                        )
+                    }
+                    IconButton(onClick = { darkTheme = !darkTheme }) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_theme),
+                            contentDescription = stringResource(Res.string.action_toggle_theme),
+                        )
+                    }
+                },
+            ) { modifier ->
+                AppNavDisplay(
+                    modifier = modifier,
+                    navigator = navigator,
+                    listViewModelFactory = listViewModelFactory,
+                    detailViewModelFactory = detailViewModelFactory,
+                    childrenViewModelFactory = childrenViewModelFactory,
+                )
+            }
         }
     }
 }

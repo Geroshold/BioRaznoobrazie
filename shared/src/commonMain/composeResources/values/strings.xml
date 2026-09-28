@@ -4,6 +4,7 @@
     <string name="taxon_number">No. %1$s</string>
     <string name="action_back">Back</string>
     <string name="action_toggle_theme">Toggle theme</string>
+    <string name="action_toggle_language">Switch language</string>
     <string name="rank_kingdom">Kingdom</string>
     <string name="rank_phylum">Phylum</string>
     <string name="rank_class">Class</string>
