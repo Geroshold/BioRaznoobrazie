@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.omgtu.abramov.list.TaxonListIntent
-import ru.omgtu.abramov.list.TaxonListState
+import ru.omgtu.abramov.ui.list.TaxonListIntent
+import ru.omgtu.abramov.ui.list.TaxonListState
 
 @Composable
 fun TaxonListScreen(

@@ -9,9 +9,10 @@ plugins {
 dependencies {
     implementation(project(":shared"))
 
+    implementation(compose.runtime)
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
-
+    implementation(compose.components.resources)
     implementation(libs.compose.uiToolingPreview)
 }
 

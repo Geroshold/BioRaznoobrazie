@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.omgtu.abramov.detail.TaxonDetailIntent
+import ru.omgtu.abramov.ui.detail.TaxonDetailIntent
 import ru.omgtu.abramov.resources.Res
 import ru.omgtu.abramov.resources.section_children
 import ru.omgtu.abramov.ui.components.TaxonBaseStats

@@ -1,4 +1,4 @@
-package ru.omgtu.abramov.list
+package ru.omgtu.abramov.ui.list
 
 import ru.omgtu.abramov.ui.model.TaxonCardUi
 
