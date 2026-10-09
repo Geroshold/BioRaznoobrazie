@@ -1,6 +1,8 @@
 package ru.omgtu.abramov.ui.model
 
 import ru.omgtu.abramov.domain.Taxon
+import ru.omgtu.abramov.domain.TaxonRepository
+import ru.omgtu.abramov.domain.getTaxons
 import ru.omgtu.abramov.utils.displayTaxonName
 import ru.omgtu.abramov.utils.displayTaxonNumber
 
@@ -19,3 +21,6 @@ fun Taxon.toCardUi(): TaxonCardUi = TaxonCardUi(
 )
 
 fun List<Taxon>.toCardsUi(): List<TaxonCardUi> = map { it.toCardUi() }
+
+suspend fun TaxonRepository.getCards(filter: String?): List<TaxonCardUi> =
+    getTaxons(filter).toCardsUi()

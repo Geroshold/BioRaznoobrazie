@@ -5,6 +5,9 @@
     <string name="action_back">Back</string>
     <string name="action_toggle_theme">Toggle theme</string>
     <string name="action_toggle_language">Switch language</string>
+    <string name="search_hint">Search by name</string>
+    <string name="search_empty">Nothing was found</string>
+    <string name="children_empty">There are no children taxons</string>
     <string name="rank_kingdom">Kingdom</string>
     <string name="rank_phylum">Phylum</string>
     <string name="rank_class">Class</string>
