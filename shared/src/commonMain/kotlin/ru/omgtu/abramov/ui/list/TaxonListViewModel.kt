@@ -13,8 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
-import ru.omgtu.abramov.ui.model.getCards
-import kotlin.collections.copy
+import ru.omgtu.abramov.domain.filterByName
 
 class TaxonListViewModel(
     private val navigator: Navigator,
@@ -26,24 +25,21 @@ class TaxonListViewModel(
     val state: StateFlow<TaxonListState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val taxa = if (parentKey == null) {
+        load(null)
+    }
+
+    private var loadJob: Job? = null
+
+    private fun load(filter: String?) {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            val base = if (parentKey == null) {
                 repository.getTaxons()
             } else {
                 repository.getChildren(parentKey)
             }
-            _state.update { it.copy(items = taxa.toCardsUi()) }
-        }
-        search(filter = null)
-    }
-
-    private var searchJob: Job? = null
-
-    private fun search(filter: String?) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            val items = repository.getCards(filter)
-            _state.update { it.copy(items = items) }
+            val filtered = base.filterByName(filter)
+            _state.update { it.copy(items = filtered.toCardsUi()) }
         }
     }
 
@@ -53,7 +49,7 @@ class TaxonListViewModel(
 
             is TaxonListIntent.QueryChanged -> {
                 _state.update { it.copy(query = intent.query) }
-                search(filter = intent.query)
+                load(intent.query)
             }
         }
     }
