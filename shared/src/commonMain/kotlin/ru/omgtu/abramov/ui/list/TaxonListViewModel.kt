@@ -1,4 +1,4 @@
-package ru.omgtu.abramov.list
+package ru.omgtu.abramov.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import ru.omgtu.abramov.domain.filterByName
 
 class TaxonListViewModel(
     private val navigator: Navigator,
@@ -23,19 +25,32 @@ class TaxonListViewModel(
     val state: StateFlow<TaxonListState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val taxa = if (parentKey == null) {
+        load(null)
+    }
+
+    private var loadJob: Job? = null
+
+    private fun load(filter: String?) {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            val base = if (parentKey == null) {
                 repository.getTaxons()
             } else {
                 repository.getChildren(parentKey)
             }
-            _state.update { it.copy(items = taxa.toCardsUi()) }
+            val filtered = base.filterByName(filter)
+            _state.update { it.copy(items = filtered.toCardsUi()) }
         }
     }
 
     fun onIntent(intent: TaxonListIntent) {
         when (intent) {
             is TaxonListIntent.CardClicked -> navigator.addToBackStack(Screen.Detail(intent.key))
+
+            is TaxonListIntent.QueryChanged -> {
+                _state.update { it.copy(query = intent.query) }
+                load(intent.query)
+            }
         }
     }
 }

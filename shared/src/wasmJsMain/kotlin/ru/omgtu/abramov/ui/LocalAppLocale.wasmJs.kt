@@ -12,9 +12,6 @@ private fun setCustomLocale(locale: String) {
 actual object LocalAppLocale {
     private val LocalAppLocale = staticCompositionLocalOf { window.navigator.language }
 
-    actual val current: String
-        @Composable get() = LocalAppLocale.current
-
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {
         val new = value ?: window.navigator.language

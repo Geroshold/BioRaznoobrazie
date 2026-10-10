@@ -1,6 +1,8 @@
 package ru.omgtu.abramov.ui.model
 
 import ru.omgtu.abramov.domain.Taxon
+import ru.omgtu.abramov.utils.displayTaxonName
+import ru.omgtu.abramov.utils.displayTaxonNumber
 
 data class TaxonDetailUi(
     val key: Int,

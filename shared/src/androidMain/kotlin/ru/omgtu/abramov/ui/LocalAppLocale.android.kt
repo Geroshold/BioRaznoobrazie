@@ -10,13 +10,6 @@ import java.util.Locale
 actual object LocalAppLocale {
     private var default: Locale? = null
 
-    actual val current: String
-        @Composable get() {
-            val configuration = LocalConfiguration.current
-            val currentLocale = ConfigurationCompat.getLocales(configuration)[0]
-            return currentLocale.toString()
-        }
-
     @Composable
     actual infix fun provides(value: String?): ProvidedValue<*> {
         val configuration = LocalConfiguration.current

@@ -12,10 +12,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.omgtu.abramov.data.TaxonRepositoryImpl
-import ru.omgtu.abramov.detail.TaxonDetailViewModelFactory
+import ru.omgtu.abramov.ui.detail.TaxonDetailViewModelFactory
 import ru.omgtu.abramov.domain.TaxonRepository
-import ru.omgtu.abramov.list.TaxonListViewModelFactory
+import ru.omgtu.abramov.ui.list.TaxonListViewModelFactory
 import ru.omgtu.abramov.resources.Res
+import ru.omgtu.abramov.resources.action_toggle_language
 import ru.omgtu.abramov.resources.action_toggle_theme
 import ru.omgtu.abramov.resources.ic_theme
 import ru.omgtu.abramov.resources.ic_language
@@ -56,7 +57,7 @@ fun App() {
                     }) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_language),
-                            contentDescription = "Switch language"
+                            contentDescription = stringResource(Res.string.action_toggle_language)
                         )
                     }
                     IconButton(onClick = { darkTheme = !darkTheme }) {
