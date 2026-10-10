@@ -9,6 +9,8 @@ data class TaxonDetailUi(
     val name: String,
     val number: String,
     val ranks: List<RankUi>,
+    val canonicalName: String?,
+    val numDescendants: Int,
     val description: String?,
     val hasChildren: Boolean,
 )
@@ -18,6 +20,8 @@ fun Taxon.toDetailUi(): TaxonDetailUi = TaxonDetailUi(
     name = displayTaxonName(scientificName),
     number = displayTaxonNumber(key),
     ranks = listOf(rank.toUi()),
+    canonicalName = canonicalName,
+    numDescendants = numDescendants,
     description = description?.trim()?.takeIf { it.isNotEmpty() },
     hasChildren = numDescendants > 0,
 )

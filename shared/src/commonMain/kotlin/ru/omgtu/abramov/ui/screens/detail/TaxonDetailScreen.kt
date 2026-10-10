@@ -14,11 +14,15 @@ import androidx.compose.ui.unit.dp
 import ru.omgtu.abramov.ui.detail.TaxonDetailIntent
 import ru.omgtu.abramov.resources.Res
 import ru.omgtu.abramov.resources.section_children
+import ru.omgtu.abramov.resources.detail_canonical_name
+import ru.omgtu.abramov.resources.detail_descendants
 import ru.omgtu.abramov.ui.components.TaxonBaseStats
 import ru.omgtu.abramov.ui.components.TaxonChildrenButton
 import ru.omgtu.abramov.ui.components.TaxonDescription
 import ru.omgtu.abramov.ui.model.TaxonDetailUi
 import org.jetbrains.compose.resources.stringResource
+import ru.omgtu.abramov.ui.components.TaxonFactRow
+import ru.omgtu.abramov.utils.formatNumDescendants
 
 @Composable
 fun TaxonDetailScreen(
@@ -37,6 +41,18 @@ fun TaxonDetailScreen(
             name = taxon.name,
             number = taxon.number,
             ranks = taxon.ranks,
+        )
+
+        taxon.canonicalName?.let { canonical ->
+            TaxonFactRow(
+                label = stringResource(Res.string.detail_canonical_name),
+                value = canonical,
+            )
+        }
+
+        TaxonFactRow(
+            label = stringResource(Res.string.detail_descendants),
+            value = formatNumDescendants(taxon.numDescendants),
         )
 
         taxon.description?.let { TaxonDescription(it) }

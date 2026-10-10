@@ -2,6 +2,8 @@
     <string name="app_title">Каталог видов</string>
     <string name="section_children">Дочерние таксоны</string>
     <string name="taxon_number">№ %1$s</string>
+    <string name="detail_canonical_name">Каноническое название</string>
+    <string name="detail_descendants">Количество потомков</string>
     <string name="action_back">Назад</string>
     <string name="action_toggle_theme">Сменить тему</string>
     <string name="action_toggle_language">Переключить язык</string>
