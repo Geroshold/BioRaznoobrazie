@@ -1,4 +1,4 @@
-package ru.omgtu.abramov.detail
+package ru.omgtu.abramov.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -9,9 +9,10 @@ plugins {
 dependencies {
     implementation(project(":shared"))
 
+    implementation(compose.runtime)
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
-
+    implementation(compose.components.resources)
     implementation(libs.compose.uiToolingPreview)
 }
 
@@ -25,4 +26,9 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
 }

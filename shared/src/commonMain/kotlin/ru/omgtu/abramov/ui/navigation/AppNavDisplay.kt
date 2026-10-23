@@ -16,10 +16,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import ru.omgtu.abramov.Screen
-import ru.omgtu.abramov.detail.TaxonDetailViewModel
-import ru.omgtu.abramov.detail.TaxonDetailViewModelFactory
-import ru.omgtu.abramov.list.TaxonListViewModel
-import ru.omgtu.abramov.list.TaxonListViewModelFactory
+import ru.omgtu.abramov.ui.detail.TaxonDetailViewModel
+import ru.omgtu.abramov.ui.detail.TaxonDetailViewModelFactory
+import ru.omgtu.abramov.ui.list.TaxonListViewModel
+import ru.omgtu.abramov.ui.list.TaxonListViewModelFactory
 import ru.omgtu.abramov.ui.screens.detail.TaxonDetailScreen
 import ru.omgtu.abramov.ui.screens.list.TaxonListScreen
 
