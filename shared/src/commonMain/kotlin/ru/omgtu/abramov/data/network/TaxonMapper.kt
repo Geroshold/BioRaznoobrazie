@@ -16,10 +16,7 @@ fun TaxonDto.toDomain(): Taxon? {
         numDescendants = numDescendants,
         kingdom = kingdom,
         phylum = phylum,
-        description = descriptions
-            ?.firstOrNull { !it.description.isNullOrBlank() }
-            ?.description
-            ?.trim(),
+        description = description
     )
 }
 

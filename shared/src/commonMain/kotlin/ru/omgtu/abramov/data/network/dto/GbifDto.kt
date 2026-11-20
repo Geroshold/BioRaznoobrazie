@@ -22,9 +22,17 @@ data class TaxonDto(
     val kingdom: String? = null,
     val phylum: String? = null,
     val descriptions: List<TaxonDescriptionDto>? = null,
+    val description: String? = null,
 )
 
 @Serializable
 data class TaxonDescriptionDto(
-    val description: String?,
+    val description: String? = null,
+    val type: String? = null,
+    val language: String? = null,
+)
+
+@Serializable
+data class DescriptionPageDto(
+    val results: List<TaxonDescriptionDto> = emptyList()
 )

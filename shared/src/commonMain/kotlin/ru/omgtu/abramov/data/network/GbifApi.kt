@@ -48,4 +48,10 @@ class GbifApi(private val client: HttpClient) {
         val fromSearch = search?.results?.firstOrNull { it.key == key }
         detail.copy(descriptions = fromSearch?.descriptions ?: detail.descriptions)
     }
+
+    suspend fun getDescriptions(key: Int): Result<TaxonPageDto> = suspendRunCatching {
+        client.get("species/$key/descriptions") {
+            parameter("limit", 10)
+        }.body()
+    }
 }
