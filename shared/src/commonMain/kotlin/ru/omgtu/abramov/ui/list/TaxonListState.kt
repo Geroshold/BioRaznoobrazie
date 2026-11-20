@@ -5,4 +5,6 @@ import ru.omgtu.abramov.ui.model.TaxonCardUi
 data class TaxonListState (
     val query: String = "",
     val items: List<TaxonCardUi> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: Throwable? = null,
 )

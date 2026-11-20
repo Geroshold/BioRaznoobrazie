@@ -16,6 +16,10 @@ import ru.omgtu.abramov.resources.Res
 import ru.omgtu.abramov.resources.section_children
 import ru.omgtu.abramov.resources.detail_canonical_name
 import ru.omgtu.abramov.resources.detail_descendants
+import ru.omgtu.abramov.resources.error_load_taxon
+import ru.omgtu.abramov.resources.error_unknown
+import ru.omgtu.abramov.ui.components.FullScreenError
+import ru.omgtu.abramov.ui.components.FullScreenLoading
 import ru.omgtu.abramov.ui.components.TaxonBaseStats
 import ru.omgtu.abramov.ui.components.TaxonChildrenButton
 import ru.omgtu.abramov.ui.components.TaxonDescription
@@ -26,46 +30,63 @@ import ru.omgtu.abramov.utils.formatNumDescendants
 
 @Composable
 fun TaxonDetailScreen(
-    taxon: TaxonDetailUi,
+    taxon: TaxonDetailUi?,
+    error: Throwable?,
     onIntent: (TaxonDetailIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        TaxonBaseStats(
-            name = taxon.name,
-            number = taxon.number,
-            ranks = taxon.ranks,
-        )
-
-        taxon.canonicalName?.let { canonical ->
-            TaxonFactRow(
-                label = stringResource(Res.string.detail_canonical_name),
-                value = canonical,
+    when {
+        error != null -> {
+            val errorMessage = error.message ?: stringResource(Res.string.error_unknown)
+            FullScreenError(
+                message = stringResource(Res.string.error_load_taxon, errorMessage),
+                onRetry = { onIntent(TaxonDetailIntent.Retry) }
             )
         }
 
-        TaxonFactRow(
-            label = stringResource(Res.string.detail_descendants),
-            value = formatNumDescendants(taxon.numDescendants),
-        )
+        taxon == null -> {
+            FullScreenLoading()
+        }
 
-        taxon.description?.let { TaxonDescription(it) }
-
-        if (taxon.hasChildren) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center,
+        else -> {
+            Column(
+                modifier = modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TaxonChildrenButton(
-                    label = stringResource(Res.string.section_children),
-                    onClick = { onIntent(TaxonDetailIntent.OpenChildren) },
+                TaxonBaseStats(
+                    name = taxon.name,
+                    number = taxon.number,
+                    ranks = taxon.ranks,
                 )
+
+                taxon.canonicalName?.let { canonical ->
+                    TaxonFactRow(
+                        label = stringResource(Res.string.detail_canonical_name),
+                        value = canonical,
+                    )
+                }
+
+                TaxonFactRow(
+                    label = stringResource(Res.string.detail_descendants),
+                    value = formatNumDescendants(taxon.numDescendants),
+                )
+
+                taxon.description?.let { TaxonDescription(it) }
+
+                if (taxon.hasChildren) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        TaxonChildrenButton(
+                            label = stringResource(Res.string.section_children),
+                            onClick = { onIntent(TaxonDetailIntent.OpenChildren) },
+                        )
+                    }
+                }
             }
         }
     }

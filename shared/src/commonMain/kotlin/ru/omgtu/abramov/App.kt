@@ -11,7 +11,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import ru.omgtu.abramov.data.TaxonRepositoryImpl
+import ru.omgtu.abramov.data.GbifTaxonRepository
+import ru.omgtu.abramov.data.network.GbifApi
+import ru.omgtu.abramov.data.network.gbifApiHttpClient
 import ru.omgtu.abramov.ui.detail.TaxonDetailViewModelFactory
 import ru.omgtu.abramov.domain.TaxonRepository
 import ru.omgtu.abramov.ui.list.TaxonListViewModelFactory
@@ -30,25 +32,27 @@ import ru.omgtu.abramov.ui.navigation.Navigator
 @Composable
 fun App() {
     var darkTheme by remember { mutableStateOf(false) }
-    val repository: TaxonRepository = remember { TaxonRepositoryImpl() }
+    val repository: TaxonRepository = remember {
+        val api = GbifApi(gbifApiHttpClient("https://api.gbif.org/v1/"))
+        GbifTaxonRepository(api)
+    }
     val navigator = remember { Navigator() }
+    val listViewModelFactory = remember { TaxonListViewModelFactory(navigator, repository) }
+    val detailViewModelFactory =
+        remember { TaxonDetailViewModelFactory(navigator, repository) }
+    val childrenViewModelFactory: (Int) -> TaxonListViewModelFactory =
+        remember {
+            { parentKey ->
+                TaxonListViewModelFactory(navigator, repository, parentKey)
+            }
+        }
+
+    val navStack = navigator.navStack.collectAsStateWithLifecycle()
+    val backNavigationIsAvailable by remember {
+        derivedStateOf { navStack.value.size > 1 }
+    }
     AppEnvironment {
         AppTheme(darkTheme) {
-            val listViewModelFactory = remember { TaxonListViewModelFactory(navigator, repository) }
-            val detailViewModelFactory =
-                remember { TaxonDetailViewModelFactory(navigator, repository) }
-            val childrenViewModelFactory: (Int) -> TaxonListViewModelFactory =
-                remember {
-                    { parentKey ->
-                        TaxonListViewModelFactory(navigator, repository, parentKey)
-                    }
-                }
-
-            val navStack = navigator.navStack.collectAsStateWithLifecycle()
-            val backNavigationIsAvailable by remember {
-                derivedStateOf { navStack.value.size > 1 }
-            }
-
             AppScaffold(
                 onBack = navigator::back.takeIf { backNavigationIsAvailable },
                 actions = {
