@@ -4,6 +4,7 @@ interface TaxonRepository {
     suspend fun getTaxons(): List<Taxon>
     suspend fun getTaxon(key: Int): Taxon?
     suspend fun getChildren(parentKey: Int): List<Taxon>
+    suspend fun getTaxonsPage(offset: Int, limit: Int): TaxonPage
 }
 
 suspend fun TaxonRepository.getTaxons(filter: String?): List<Taxon> =

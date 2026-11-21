@@ -36,13 +36,18 @@ class TaxonListViewModel(
         loadJob = viewModelScope.launch {
             try {
                 val base = if (parentKey == null) {
-                    repository.getTaxons()
+                    repository.getTaxonsPage(offset = 0, limit = 50).items
                 } else {
                     repository.getChildren(parentKey)
                 }
                 val filtered = base.filterByName(query)
                 _state.update {
-                    it.copy(items = filtered.toCardsUi(), isLoading = false, error = null)
+                    it.copy(
+                        items = filtered.toCardsUi(),
+                        isLoading = false,
+                        error = null,
+                        endOfRecords = parentKey != null || base.size < 50
+                    )
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
@@ -50,6 +55,30 @@ class TaxonListViewModel(
                 _state.update {
                     it.copy(isLoading = false, error = error)
                 }
+            }
+        }
+    }
+
+    private fun loadMore() {
+        val current = _state.value
+        if (current.isLoading || current.isLoadingMore || current.endOfRecords || parentKey != null) return
+
+        _state.update { it.copy(isLoadingMore = true) }
+        viewModelScope.launch {
+            try {
+                val page = repository.getTaxonsPage(offset = current.items.size, limit = 50)
+                val newItems = page.items.toCardsUi()
+                _state.update {
+                    it.copy(
+                        items = it.items + newItems,
+                        isLoadingMore = false,
+                        endOfRecords = page.endOfRecords
+                    )
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Throwable) {
+                _state.update { it.copy(isLoadingMore = false, error = error) }
             }
         }
     }
@@ -63,6 +92,8 @@ class TaxonListViewModel(
                 _state.update { it.copy(query = intent.query) }
                 load(query = intent.query)
             }
+
+            TaxonListIntent.LoadMore -> loadMore()
         }
     }
 }

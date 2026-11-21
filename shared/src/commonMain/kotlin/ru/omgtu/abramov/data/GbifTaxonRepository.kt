@@ -2,10 +2,10 @@ package ru.omgtu.abramov.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.omgtu.abramov.core.suspendRunCatching
 import ru.omgtu.abramov.data.network.GbifApi
 import ru.omgtu.abramov.data.network.toDomain
 import ru.omgtu.abramov.domain.Taxon
+import ru.omgtu.abramov.domain.TaxonPage
 import ru.omgtu.abramov.domain.TaxonRepository
 
 class GbifTaxonRepository(
@@ -32,6 +32,16 @@ class GbifTaxonRepository(
 
         detailDto.copy(description = cleanDescription).toDomain()
     }
+
+    override suspend fun getTaxonsPage(offset: Int, limit: Int): TaxonPage =
+        withContext(Dispatchers.Default) {
+            val result = api.searchTaxons(query = null, offset = offset, limit = limit, rank = "KINGDOM")
+                .getOrThrow()
+            TaxonPage(
+                items = result.results.toDomain(),
+                endOfRecords = result.endOfRecords
+            )
+        }
 
     override suspend fun getChildren(parentKey: Int): List<Taxon> = withContext(Dispatchers.Default) {
         api.getChildren(parentKey = parentKey, offset = 0, limit = pageSize)

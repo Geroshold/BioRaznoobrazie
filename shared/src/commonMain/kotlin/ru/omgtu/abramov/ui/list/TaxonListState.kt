@@ -6,5 +6,7 @@ data class TaxonListState (
     val query: String = "",
     val items: List<TaxonCardUi> = emptyList(),
     val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val endOfRecords: Boolean = false,
     val error: Throwable? = null,
 )
