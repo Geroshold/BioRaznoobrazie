@@ -7,6 +7,7 @@ import ru.omgtu.abramov.data.network.toDomain
 import ru.omgtu.abramov.domain.Taxon
 import ru.omgtu.abramov.domain.TaxonPage
 import ru.omgtu.abramov.domain.TaxonRepository
+import ru.omgtu.abramov.utils.stripHtml
 
 class GbifTaxonRepository(
     private val api: GbifApi,
@@ -28,7 +29,7 @@ class GbifTaxonRepository(
             ?.firstOrNull { !it.description.isNullOrBlank() }
             ?.description
 
-        val cleanDescription = rawDescription?.let { stripHtml(it) }
+        val cleanDescription = rawDescription?.stripHtml()
 
         detailDto.copy(description = cleanDescription).toDomain()
     }
@@ -47,19 +48,5 @@ class GbifTaxonRepository(
         api.getChildren(parentKey = parentKey, offset = 0, limit = pageSize)
             .map { page -> page.results.toDomain() }
             .getOrThrow()
-    }
-
-    private fun stripHtml(html: String?): String? {
-        if (html.isNullOrBlank()) return html
-        return html
-            .replace(Regex("<[^>]*>"), " ")
-            .replace("&nbsp;", " ")
-            .replace("&amp;", "&")
-            .replace("&lt;", "<")
-            .replace("&gt;", ">")
-            .replace("&quot;", "\"")
-            .replace("&#39;", "'")
-            .replace(Regex("\\s+"), " ")
-            .trim()
     }
 }
