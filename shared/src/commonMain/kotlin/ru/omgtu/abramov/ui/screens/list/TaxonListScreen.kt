@@ -47,13 +47,13 @@ fun TaxonListScreen(
             singleLine = true,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         )
-        val errorMessage = state.error?.let {
+        val errorMessage = state.errorDetail?.let {
             it.message ?: stringResource(Res.string.error_unknown)
         }
         when {
             state.isLoading && state.items.isEmpty() -> FullScreenLoading()
 
-            state.error != null && state.items.isEmpty() ->
+            state.errorDetail != null && state.items.isEmpty() ->
                 FullScreenError(
                     message = stringResource(Res.string.error_load_list, errorMessage ?: ""),
                     onRetry = { onIntent(TaxonListIntent.QueryChanged(state.query)) },

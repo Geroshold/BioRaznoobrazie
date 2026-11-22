@@ -3,15 +3,16 @@ package ru.omgtu.abramov.ui.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import ru.omgtu.abramov.Screen
 import ru.omgtu.abramov.domain.TaxonRepository
 import ru.omgtu.abramov.ui.model.TaxonDetailUi
 import ru.omgtu.abramov.ui.model.toDetailUi
 import ru.omgtu.abramov.ui.navigation.Navigator
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class TaxonDetailViewModel(
     private val key: Int,
@@ -31,14 +32,15 @@ class TaxonDetailViewModel(
 
     private fun load() {
         viewModelScope.launch {
-            try {
-                val taxon = repository.getTaxon(key)
-                _state.value = taxon?.toDetailUi()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (error: Throwable) {
-                _error.value = error
-            }
+            _error.value = null
+            repository.getTaxon(key).fold(
+                onSuccess = { taxon ->
+                    _state.value = taxon?.toDetailUi()
+                },
+                onFailure = { throwable ->
+                    _error.value = throwable
+                },
+            )
         }
     }
 
@@ -49,9 +51,7 @@ class TaxonDetailViewModel(
                     navigator.addToBackStack(Screen.Children(it.key, it.name))
                 }
             }
-            TaxonDetailIntent.Retry -> {
-                load()
-            }
+            TaxonDetailIntent.Retry -> load()
         }
     }
 }

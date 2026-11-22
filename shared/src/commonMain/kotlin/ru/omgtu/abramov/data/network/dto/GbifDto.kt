@@ -34,5 +34,9 @@ data class TaxonDescriptionDto(
 
 @Serializable
 data class DescriptionPageDto(
-    val results: List<TaxonDescriptionDto> = emptyList()
+    val count: Int = 0,
+    val offset: Int = 0,
+    val limit: Int = 0,
+    val endOfRecords: Boolean = false,
+    val results: List<TaxonDescriptionDto> = emptyList(),
 )

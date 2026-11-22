@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import ru.omgtu.abramov.core.suspendRunCatching
+import ru.omgtu.abramov.data.network.dto.DescriptionPageDto
 import ru.omgtu.abramov.data.network.dto.TaxonDto
 import ru.omgtu.abramov.data.network.dto.TaxonPageDto
 
@@ -39,17 +40,7 @@ class GbifApi(private val client: HttpClient) {
         }.body()
     }
 
-    suspend fun getTaxonWithDescription(key: Int): Result<TaxonDto> = suspendRunCatching {
-        val detail = getTaxon(key).getOrThrow()
-        if (!detail.descriptions.isNullOrEmpty()) return@suspendRunCatching detail
-
-        val name = detail.scientificName ?: return@suspendRunCatching detail
-        val search = searchTaxons(query = name, offset = 0, limit = 5).getOrNull()
-        val fromSearch = search?.results?.firstOrNull { it.key == key }
-        detail.copy(descriptions = fromSearch?.descriptions ?: detail.descriptions)
-    }
-
-    suspend fun getDescriptions(key: Int): Result<TaxonPageDto> = suspendRunCatching {
+    suspend fun getDescriptions(key: Int): Result<DescriptionPageDto> = suspendRunCatching {
         client.get("species/$key/descriptions") {
             parameter("limit", 10)
         }.body()
