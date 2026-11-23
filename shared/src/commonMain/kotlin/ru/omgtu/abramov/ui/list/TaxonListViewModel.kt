@@ -3,6 +3,7 @@ package ru.omgtu.abramov.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,15 +29,21 @@ class TaxonListViewModel(
     private val parentKey: Int? = null,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(TaxonListState(isLoading = true))
+    private val isSearchEnabled = parentKey == null
+
+    private val _state = MutableStateFlow<TaxonListState>(
+        TaxonListState.Loading(isSearchEnabled = isSearchEnabled)
+    )
     val state: StateFlow<TaxonListState> = _state.asStateFlow()
 
     private val queryFlow = MutableStateFlow("")
+    private var loadJob: Job? = null
+    private var loadMoreJob: Job? = null
 
     init {
         loadFirstPage(query = null)
 
-        if (parentKey == null) {
+        if (isSearchEnabled) {
             viewModelScope.launch {
                 queryFlow
                     .drop(1)
@@ -51,12 +58,13 @@ class TaxonListViewModel(
     }
 
     private fun loadFirstPage(query: String?) {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadMoreJob?.cancel()
+        loadJob = viewModelScope.launch {
             _state.update {
-                it.copy(
-                    isLoading = true,
-                    loadMoreFailed = false,
-                    errorDetail = null,
+                TaxonListState.Loading(
+                    query = it.query,
+                    isSearchEnabled = isSearchEnabled,
                 )
             }
 
@@ -68,21 +76,21 @@ class TaxonListViewModel(
 
             result.fold(
                 onSuccess = { page ->
-                    _state.update {
-                        it.copy(
+                    _state.update { current ->
+                        TaxonListState.Content(
+                            query = current.query,
+                            isSearchEnabled = isSearchEnabled,
                             items = page.items.toCardsUi(),
-                            isLoading = false,
-                            loadMoreFailed = false,
-                            errorDetail = null,
                             endOfRecords = page.endOfRecords,
                         )
                     }
                 },
                 onFailure = { throwable ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            errorDetail = throwable,
+                    _state.update { current ->
+                        TaxonListState.Error(
+                            query = current.query,
+                            isSearchEnabled = isSearchEnabled,
+                            throwable = throwable,
                         )
                     }
                 },
@@ -91,11 +99,16 @@ class TaxonListViewModel(
     }
 
     private fun loadMore() {
-        val current = _state.value
-        if (current.isLoading || current.isLoadingMore || current.endOfRecords) return
+        val current = _state.value as? TaxonListState.Content ?: return
+        if (current.isLoadingMore || current.endOfRecords || loadMoreJob?.isActive == true) return
 
-        viewModelScope.launch {
-            _state.update { it.copy(isLoadingMore = true, loadMoreFailed = false) }
+        loadMoreJob = viewModelScope.launch {
+            _state.update { state ->
+                (state as? TaxonListState.Content)?.copy(
+                    isLoadingMore = true,
+                    loadMoreError = null,
+                ) ?: state
+            }
 
             val activeQuery = current.query.trim().ifBlank { null }
             val result = if (parentKey == null) {
@@ -115,24 +128,25 @@ class TaxonListViewModel(
             result.fold(
                 onSuccess = { page ->
                     val newItems = page.items.toCardsUi()
-                    _state.update {
-                        val seenKeys = it.items.mapTo(HashSet()) { card -> card.key }
-                        val uniqueNewItems = newItems.filter { card -> seenKeys.add(card.key) }
+                    _state.update { state ->
+                        val content = state as? TaxonListState.Content ?: return@update state
+                        val seenKeys = content.items.mapTo(HashSet()) { it.key }
+                        val uniqueNewItems = newItems.filter { seenKeys.add(it.key) }
 
-                        it.copy(
-                            items = it.items + uniqueNewItems,
+                        content.copy(
+                            items = content.items + uniqueNewItems,
                             isLoadingMore = false,
-                            loadMoreFailed = false,
+                            loadMoreError = null,
                             endOfRecords = page.endOfRecords,
                         )
                     }
                 },
-                onFailure = {
-                    _state.update {
-                        it.copy(
+                onFailure = { throwable ->
+                    _state.update { state ->
+                        (state as? TaxonListState.Content)?.copy(
                             isLoadingMore = false,
-                            loadMoreFailed = true,
-                        )
+                            loadMoreError = throwable,
+                        ) ?: state
                     }
                 },
             )
@@ -145,11 +159,29 @@ class TaxonListViewModel(
                 navigator.addToBackStack(Screen.Detail(intent.key))
 
             is TaxonListIntent.QueryChanged -> {
-                _state.update { it.copy(query = intent.query) }
+                if (!isSearchEnabled) return
+                _state.update { current ->
+                    when (current) {
+                        is TaxonListState.Loading -> current.copy(query = intent.query)
+                        is TaxonListState.Error -> current.copy(query = intent.query)
+                        is TaxonListState.Content -> current.copy(query = intent.query)
+                    }
+                }
                 queryFlow.value = intent.query
             }
 
             TaxonListIntent.LoadMore -> loadMore()
+
+            TaxonListIntent.Retry -> {
+                when (_state.value) {
+                    is TaxonListState.Error -> {
+                        val activeQuery = _state.value.query.trim().ifBlank { null }
+                        loadFirstPage(query = activeQuery)
+                    }
+                    is TaxonListState.Content -> loadMore()
+                    is TaxonListState.Loading -> Unit
+                }
+            }
         }
     }
 }
