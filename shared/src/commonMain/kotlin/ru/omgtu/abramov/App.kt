@@ -28,12 +28,13 @@ import ru.omgtu.abramov.ui.AppTheme
 import ru.omgtu.abramov.ui.components.AppScaffold
 import ru.omgtu.abramov.ui.navigation.AppNavDisplay
 import ru.omgtu.abramov.ui.navigation.Navigator
+import ru.omgtu.abramov.config.ApiConfig
 
 @Composable
 fun App() {
     var darkTheme by remember { mutableStateOf(false) }
     val repository: TaxonRepository = remember {
-        val api = GbifApi(gbifApiHttpClient("https://api.gbif.org/v1/"))
+        val api = GbifApi(gbifApiHttpClient(ApiConfig.BASE_URL))
         GbifTaxonRepository(api)
     }
     val navigator = remember { Navigator() }

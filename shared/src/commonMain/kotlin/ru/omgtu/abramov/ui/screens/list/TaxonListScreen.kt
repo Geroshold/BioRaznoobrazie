@@ -54,17 +54,6 @@ fun TaxonListScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         )
-        if (state.isSearchEnabled) {
-            OutlinedTextField(
-                value = state.query,
-                onValueChange = { onIntent(TaxonListIntent.QueryChanged(it)) },
-                label = { Text(stringResource(Res.string.search_hint)) },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-            )
-        }
 
         when (state) {
             is TaxonListState.Loading -> FullScreenLoading()
@@ -80,7 +69,7 @@ fun TaxonListScreen(
 
             is TaxonListState.Content -> {
                 if (state.items.isEmpty()) {
-                    val emptyText = if (state.isSearchEnabled) {
+                    val emptyText = if (state.query.isNotBlank() || state.allItems.isNotEmpty()) {
                         stringResource(Res.string.search_empty)
                     } else {
                         stringResource(Res.string.children_empty)

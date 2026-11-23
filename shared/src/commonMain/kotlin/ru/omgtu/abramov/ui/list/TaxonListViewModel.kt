@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.omgtu.abramov.Screen
 import ru.omgtu.abramov.domain.TaxonRepository
+import ru.omgtu.abramov.ui.model.TaxonCardUi
 import ru.omgtu.abramov.ui.model.toCardsUi
 import ru.omgtu.abramov.ui.navigation.Navigator
 
@@ -29,11 +30,7 @@ class TaxonListViewModel(
     private val parentKey: Int? = null,
 ) : ViewModel() {
 
-    private val isSearchEnabled = parentKey == null
-
-    private val _state = MutableStateFlow<TaxonListState>(
-        TaxonListState.Loading(isSearchEnabled = isSearchEnabled)
-    )
+    private val _state = MutableStateFlow<TaxonListState>(TaxonListState.Loading())
     val state: StateFlow<TaxonListState> = _state.asStateFlow()
 
     private val queryFlow = MutableStateFlow("")
@@ -43,7 +40,7 @@ class TaxonListViewModel(
     init {
         loadFirstPage(query = null)
 
-        if (isSearchEnabled) {
+        if (parentKey == null) {
             viewModelScope.launch {
                 queryFlow
                     .drop(1)
@@ -57,16 +54,17 @@ class TaxonListViewModel(
         }
     }
 
+    private fun filterChildren(items: List<TaxonCardUi>, query: String): List<TaxonCardUi> {
+        val needle = query.trim()
+        if (needle.isEmpty()) return items
+        return items.filter { it.name.contains(needle, ignoreCase = true) }
+    }
+
     private fun loadFirstPage(query: String?) {
         loadJob?.cancel()
         loadMoreJob?.cancel()
         loadJob = viewModelScope.launch {
-            _state.update {
-                TaxonListState.Loading(
-                    query = it.query,
-                    isSearchEnabled = isSearchEnabled,
-                )
-            }
+            _state.update { TaxonListState.Loading(query = it.query) }
 
             val result = if (parentKey == null) {
                 repository.getTaxonsPage(offset = 0, limit = PAGE_SIZE, query = query)
@@ -76,11 +74,17 @@ class TaxonListViewModel(
 
             result.fold(
                 onSuccess = { page ->
+                    val cards = page.items.toCardsUi()
                     _state.update { current ->
+                        val visibleItems = if (parentKey == null) {
+                            cards
+                        } else {
+                            filterChildren(cards, current.query)
+                        }
                         TaxonListState.Content(
                             query = current.query,
-                            isSearchEnabled = isSearchEnabled,
-                            items = page.items.toCardsUi(),
+                            allItems = cards,
+                            items = visibleItems,
                             endOfRecords = page.endOfRecords,
                         )
                     }
@@ -89,7 +93,6 @@ class TaxonListViewModel(
                     _state.update { current ->
                         TaxonListState.Error(
                             query = current.query,
-                            isSearchEnabled = isSearchEnabled,
                             throwable = throwable,
                         )
                     }
@@ -113,14 +116,14 @@ class TaxonListViewModel(
             val activeQuery = current.query.trim().ifBlank { null }
             val result = if (parentKey == null) {
                 repository.getTaxonsPage(
-                    offset = current.items.size,
+                    offset = current.allItems.size,
                     limit = PAGE_SIZE,
                     query = activeQuery,
                 )
             } else {
                 repository.getChildrenPage(
                     parentKey = parentKey,
-                    offset = current.items.size,
+                    offset = current.allItems.size,
                     limit = PAGE_SIZE,
                 )
             }
@@ -130,11 +133,18 @@ class TaxonListViewModel(
                     val newItems = page.items.toCardsUi()
                     _state.update { state ->
                         val content = state as? TaxonListState.Content ?: return@update state
-                        val seenKeys = content.items.mapTo(HashSet()) { it.key }
+                        val seenKeys = content.allItems.mapTo(HashSet()) { it.key }
                         val uniqueNewItems = newItems.filter { seenKeys.add(it.key) }
+                        val updatedAll = content.allItems + uniqueNewItems
+                        val visibleItems = if (parentKey == null) {
+                            updatedAll
+                        } else {
+                            filterChildren(updatedAll, content.query)
+                        }
 
                         content.copy(
-                            items = content.items + uniqueNewItems,
+                            allItems = updatedAll,
+                            items = visibleItems,
                             isLoadingMore = false,
                             loadMoreError = null,
                             endOfRecords = page.endOfRecords,
@@ -159,15 +169,23 @@ class TaxonListViewModel(
                 navigator.addToBackStack(Screen.Detail(intent.key))
 
             is TaxonListIntent.QueryChanged -> {
-                if (!isSearchEnabled) return
                 _state.update { current ->
                     when (current) {
                         is TaxonListState.Loading -> current.copy(query = intent.query)
                         is TaxonListState.Error -> current.copy(query = intent.query)
-                        is TaxonListState.Content -> current.copy(query = intent.query)
+                        is TaxonListState.Content -> current.copy(
+                            query = intent.query,
+                            items = if (parentKey == null) {
+                                current.items
+                            } else {
+                                filterChildren(current.allItems, intent.query)
+                            },
+                        )
                     }
                 }
-                queryFlow.value = intent.query
+                if (parentKey == null) {
+                    queryFlow.value = intent.query
+                }
             }
 
             TaxonListIntent.LoadMore -> loadMore()
