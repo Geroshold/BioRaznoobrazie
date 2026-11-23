@@ -17,4 +17,9 @@
     <string name="rank_family">Семейство</string>
     <string name="rank_genus">Род</string>
     <string name="rank_species">Вид</string>
+    <string name="list_error">Не удалось загрузить: %1$s</string>
+    <string name="error_load_list">Не удалось загрузить список: %1$s</string>
+    <string name="error_load_taxon">Не удалось загрузить таксон: %1$s</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="action_retry">Повторить</string>
 </resources>

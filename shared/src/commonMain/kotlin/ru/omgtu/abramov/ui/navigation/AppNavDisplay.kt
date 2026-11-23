@@ -57,7 +57,13 @@ fun AppNavDisplay(
                     extras = TaxonDetailViewModelFactory.extrasFor(screen.key),
                 )
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                state?.let { TaxonDetailScreen(taxon = it, onIntent = viewModel::onIntent) }
+                val error by viewModel.error.collectAsStateWithLifecycle()
+
+                TaxonDetailScreen(
+                    taxon = state,
+                    error = error,
+                    onIntent = viewModel::onIntent,
+                )
             }
 
             entry<Screen.Children> { screen ->

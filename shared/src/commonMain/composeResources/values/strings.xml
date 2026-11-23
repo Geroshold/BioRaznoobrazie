@@ -17,4 +17,9 @@
     <string name="rank_family">Family</string>
     <string name="rank_genus">Genus</string>
     <string name="rank_species">Species</string>
+    <string name="list_error">Couldn't load: %1$s</string>
+    <string name="error_load_list">Couldn't load list: %1$s</string>
+    <string name="error_load_taxon">Couldn't load taxon: %1$s</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="action_retry">Retry</string>
 </resources>
